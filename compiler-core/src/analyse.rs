@@ -437,7 +437,6 @@ fn register_types_from_custom_type<'a>(
         public,
         parameters,
         location,
-        constructors,
         ..
     } = t;
     assert_unique_type_name(names, name, *location)?;
@@ -460,8 +459,6 @@ fn register_types_from_custom_type<'a>(
             typ,
         },
     )?;
-    let constructor_names = constructors.iter().map(|c| c.name.clone()).collect();
-    environment.insert_type_to_constructors(name.clone(), constructor_names);
     if !public {
         environment.init_usage(name.clone(), EntityKind::PrivateType, *location);
     };
@@ -556,6 +553,11 @@ fn register_values_from_custom_type(
 
         environment.insert_variable(constructor.name.clone(), constructor_info, typ, *public);
     }
+
+    // TODO: record the types of the values passed into the constructors also
+    let constructor_names = constructors.iter().map(|c| c.name.clone()).collect();
+    environment.insert_type_to_constructors(name.clone(), constructor_names);
+
     Ok(())
 }
 
