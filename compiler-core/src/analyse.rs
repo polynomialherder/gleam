@@ -501,6 +501,9 @@ fn register_values_from_custom_type(
         };
         environment.insert_accessors(name.clone(), map)
     }
+
+    let mut constructors_data = vec![];
+
     for constructor in constructors {
         assert_unique_name(names, &constructor.name, constructor.location)?;
 
@@ -523,7 +526,7 @@ fn register_values_from_custom_type(
         // Insert constructor function into module scope
         let typ = match constructor.arguments.len() {
             0 => typ.clone(),
-            _ => fn_(args_types, typ.clone()),
+            _ => fn_(args_types.clone(), typ.clone()),
         };
         let constructor_info = ValueConstructorVariant::Record {
             documentation: constructor.documentation.clone(),
@@ -552,17 +555,15 @@ fn register_values_from_custom_type(
             );
         }
 
+        constructors_data.push(TypeValueConstructor {
+            name: constructor.name.clone(),
+            parameters: args_types,
+        });
+
         environment.insert_variable(constructor.name.clone(), constructor_info, typ, *public);
     }
 
-    // TODO: record the types of the values passed into the constructors also
-    let constructor_names = constructors
-        .iter()
-        .map(|c| TypeValueConstructor {
-            name: c.name.clone(),
-        })
-        .collect();
-    environment.insert_type_to_constructors(name.clone(), constructor_names);
+    environment.insert_type_to_constructors(name.clone(), constructors_data);
 
     Ok(())
 }
@@ -594,7 +595,7 @@ fn register_external_function(
             args_types.push(hydrator.type_from_ast(&arg.annotation, environment)?);
             builder.add(arg.label.as_ref(), arg.location)?;
         }
-        let typ = fn_(args_types, return_type);
+        let typ = fn_(args_types.clone(), return_type);
         Ok((typ, builder.finish()))
     })?;
     environment.insert_module_value(

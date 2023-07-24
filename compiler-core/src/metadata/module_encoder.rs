@@ -152,6 +152,12 @@ impl<'a> ModuleEncoder<'a> {
         constructor: &TypeValueConstructor,
     ) {
         builder.set_name(&constructor.name);
+        self.build_types(
+            builder
+                .reborrow()
+                .init_parameters(constructor.parameters.len() as u32),
+            &constructor.parameters,
+        )
     }
 
     fn build_value_constructor(

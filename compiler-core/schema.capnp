@@ -30,6 +30,7 @@ struct Module {
 
 struct TypeValueConstructor {
   name @0 :Text;
+  parameters @1 :List(Type);
 }
 
 struct TypeConstructor {

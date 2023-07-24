@@ -249,7 +249,10 @@ fn module_type_to_constructors_mapping() {
         types: HashMap::new(),
         types_value_constructors: [(
             "SomeType".into(),
-            vec![TypeValueConstructor { name: "One".into() }],
+            vec![TypeValueConstructor {
+                name: "One".into(),
+                parameters: vec![],
+            }],
         )]
         .into(),
         accessors: HashMap::new(),

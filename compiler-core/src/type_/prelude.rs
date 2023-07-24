@@ -208,9 +208,11 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
                     vec![
                         TypeValueConstructor {
                             name: "True".into(),
+                            parameters: vec![],
                         },
                         TypeValueConstructor {
                             name: "False".into(),
+                            parameters: vec![],
                         },
                     ],
                 );
@@ -332,7 +334,7 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
                     TypeConstructor {
                         origin: Default::default(),
                         parameters: vec![result_value.clone(), result_error.clone()],
-                        typ: result(result_value, result_error),
+                        typ: result(result_value.clone(), result_error.clone()),
                         module: PRELUDE_MODULE_NAME.into(),
                         public: true,
                     },
@@ -340,9 +342,13 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
                 let _ = prelude.types_value_constructors.insert(
                     RESULT.into(),
                     vec![
-                        TypeValueConstructor { name: "Ok".into() },
+                        TypeValueConstructor {
+                            name: "Ok".into(),
+                            parameters: vec![result_value],
+                        },
                         TypeValueConstructor {
                             name: "Error".into(),
+                            parameters: vec![result_error],
                         },
                     ],
                 );

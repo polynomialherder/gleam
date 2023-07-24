@@ -464,6 +464,7 @@ pub struct ModuleInterface {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeValueConstructor {
     pub name: SmolStr,
+    pub parameters: Vec<Arc<Type>>,
 }
 
 impl ModuleInterface {

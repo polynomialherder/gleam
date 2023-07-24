@@ -154,6 +154,7 @@ impl ModuleDecoder {
     ) -> Result<TypeValueConstructor> {
         Ok(TypeValueConstructor {
             name: reader.get_name()?.into(),
+            parameters: read_vec!(reader.get_parameters()?, self, type_),
         })
     }
 

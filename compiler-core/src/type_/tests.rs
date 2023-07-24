@@ -480,18 +480,24 @@ fn infer_module_type_retention_test() {
                     vec![
                         TypeValueConstructor {
                             name: "True".into(),
+                            parameters: vec![],
                         },
                         TypeValueConstructor {
-                            name: "False".into()
+                            name: "False".into(),
+                            parameters: vec![],
                         }
                     ]
                 ),
                 (
                     "Result".into(),
                     vec![
-                        TypeValueConstructor { name: "Ok".into() },
                         TypeValueConstructor {
-                            name: "Error".into()
+                            name: "Ok".into(),
+                            parameters: vec![generic_var(1)]
+                        },
+                        TypeValueConstructor {
+                            name: "Error".into(),
+                            parameters: vec![generic_var(2)]
                         }
                     ]
                 )
