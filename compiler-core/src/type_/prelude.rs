@@ -3,7 +3,8 @@ use strum::{EnumIter, IntoEnumIterator};
 use crate::{ast::SrcSpan, build::Origin, uid::UniqueIdGenerator};
 
 use super::{
-    ModuleInterface, Type, TypeConstructor, TypeVar, ValueConstructor, ValueConstructorVariant,
+    ModuleInterface, Type, TypeConstructor, TypeValueConstructor, TypeVar, ValueConstructor,
+    ValueConstructorVariant,
 };
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
@@ -202,9 +203,17 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
             }
 
             PreludeType::Bool => {
-                let _ = prelude
-                    .types_value_constructors
-                    .insert(BOOL.into(), vec!["True".into(), "False".into()]);
+                let _ = prelude.types_value_constructors.insert(
+                    BOOL.into(),
+                    vec![
+                        TypeValueConstructor {
+                            name: "True".into(),
+                        },
+                        TypeValueConstructor {
+                            name: "False".into(),
+                        },
+                    ],
+                );
                 let _ = prelude.values.insert(
                     "True".into(),
                     value(
@@ -328,9 +337,15 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
                         public: true,
                     },
                 );
-                let _ = prelude
-                    .types_value_constructors
-                    .insert(RESULT.into(), vec!["Ok".into(), "Error".into()]);
+                let _ = prelude.types_value_constructors.insert(
+                    RESULT.into(),
+                    vec![
+                        TypeValueConstructor { name: "Ok".into() },
+                        TypeValueConstructor {
+                            name: "Error".into(),
+                        },
+                    ],
+                );
                 let ok = generic_var(ids.next());
                 let error = generic_var(ids.next());
                 let _ = prelude.values.insert(

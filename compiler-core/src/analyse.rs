@@ -4,6 +4,7 @@ mod tests;
 use crate::ast::{UntypedArg, UntypedStatement};
 use crate::dep_tree;
 use crate::type_::error::MissingAnnotation;
+use crate::type_::TypeValueConstructor;
 use crate::{
     ast::{
         self, BitStringSegmentOption, CustomType, Definition, DefinitionLocation, ExternalFunction,
@@ -555,7 +556,12 @@ fn register_values_from_custom_type(
     }
 
     // TODO: record the types of the values passed into the constructors also
-    let constructor_names = constructors.iter().map(|c| c.name.clone()).collect();
+    let constructor_names = constructors
+        .iter()
+        .map(|c| TypeValueConstructor {
+            name: c.name.clone(),
+        })
+        .collect();
     environment.insert_type_to_constructors(name.clone(), constructor_names);
 
     Ok(())

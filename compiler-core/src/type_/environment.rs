@@ -30,7 +30,7 @@ pub struct Environment<'a> {
     pub module_types: HashMap<SmolStr, TypeConstructor>,
 
     /// Mapping from types to constructor names in the current module (or the prelude)
-    pub module_types_constructors: HashMap<SmolStr, Vec<SmolStr>>,
+    pub module_types_constructors: HashMap<SmolStr, Vec<TypeValueConstructor>>,
 
     /// Values defined in the current module (or the prelude)
     pub module_values: HashMap<SmolStr, ValueConstructor>,
@@ -232,7 +232,11 @@ impl<'a> Environment<'a> {
 
     /// Map a type to constructors in the current scope.
     ///
-    pub fn insert_type_to_constructors(&mut self, type_name: SmolStr, constructors: Vec<SmolStr>) {
+    pub fn insert_type_to_constructors(
+        &mut self,
+        type_name: SmolStr,
+        constructors: Vec<TypeValueConstructor>,
+    ) {
         let _ = self
             .module_types_constructors
             .insert(type_name, constructors);
@@ -280,7 +284,7 @@ impl<'a> Environment<'a> {
         &mut self,
         full_module_name: Option<&str>,
         name: &SmolStr,
-    ) -> Result<&Vec<SmolStr>, UnknownTypeConstructorError> {
+    ) -> Result<&Vec<TypeValueConstructor>, UnknownTypeConstructorError> {
         match full_module_name {
             None => self.module_types_constructors.get(name).ok_or_else(|| {
                 UnknownTypeConstructorError::Type {
@@ -544,7 +548,7 @@ impl<'a> Environment<'a> {
 
                 if let Ok(constructors) = self.get_constructors_for_type(m, type_name) {
                     let mut unmatched_constructors: HashSet<SmolStr> =
-                        constructors.iter().cloned().collect();
+                        constructors.iter().map(|e| e.name.clone()).collect();
 
                     for p in &patterns {
                         // ignore Assign patterns

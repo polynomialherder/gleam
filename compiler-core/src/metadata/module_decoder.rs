@@ -12,7 +12,7 @@ use crate::{
     schema_capnp::{self as schema, *},
     type_::{
         self, AccessorsMap, FieldMap, ModuleInterface, RecordAccessor, Type, TypeConstructor,
-        ValueConstructor, ValueConstructorVariant,
+        TypeValueConstructor, ValueConstructor, ValueConstructorVariant,
     },
     uid::UniqueIdGenerator,
     Result,
@@ -71,7 +71,7 @@ impl ModuleDecoder {
             types_value_constructors: read_hashmap!(
                 reader.get_types_constructors()?,
                 self,
-                constructors_list
+                type_value_constructors
             ),
             values: read_hashmap!(reader.get_values()?, self, value_constructor),
             accessors: read_hashmap!(reader.get_accessors()?, self, accessors_map),
@@ -138,8 +138,23 @@ impl ModuleDecoder {
         Ok(type_::generic_var(id))
     }
 
-    fn constructors_list(&mut self, reader: &capnp::text_list::Reader<'_>) -> Result<Vec<SmolStr>> {
-        Ok(reader.iter().map_ok(SmolStr::new).try_collect()?)
+    fn type_value_constructors(
+        &mut self,
+        reader: &capnp::struct_list::Reader<'_, type_value_constructor::Owned>,
+    ) -> Result<Vec<TypeValueConstructor>> {
+        reader
+            .iter()
+            .map(|r| self.type_value_constructor(&r))
+            .try_collect()
+    }
+
+    fn type_value_constructor(
+        &mut self,
+        reader: &type_value_constructor::Reader<'_>,
+    ) -> Result<TypeValueConstructor> {
+        Ok(TypeValueConstructor {
+            name: reader.get_name()?.into(),
+        })
     }
 
     fn value_constructor(

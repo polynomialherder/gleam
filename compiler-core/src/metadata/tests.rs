@@ -9,7 +9,8 @@ use crate::{
     },
     build::Origin,
     type_::{
-        self, ModuleInterface, Type, TypeConstructor, ValueConstructor, ValueConstructorVariant,
+        self, ModuleInterface, Type, TypeConstructor, TypeValueConstructor, ValueConstructor,
+        ValueConstructorVariant,
     },
     uid::UniqueIdGenerator,
 };
@@ -246,7 +247,11 @@ fn module_type_to_constructors_mapping() {
         origin: Origin::Src,
         name: "a".into(),
         types: HashMap::new(),
-        types_value_constructors: [("SomeType".into(), vec!["One".into()])].into(),
+        types_value_constructors: [(
+            "SomeType".into(),
+            vec![TypeValueConstructor { name: "One".into() }],
+        )]
+        .into(),
         accessors: HashMap::new(),
         values: HashMap::new(),
     };

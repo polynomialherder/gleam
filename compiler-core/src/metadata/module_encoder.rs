@@ -7,8 +7,8 @@ use crate::{
     },
     schema_capnp::{self as schema, *},
     type_::{
-        self, AccessorsMap, FieldMap, RecordAccessor, Type, TypeConstructor, TypeVar,
-        ValueConstructor, ValueConstructorVariant,
+        self, AccessorsMap, FieldMap, RecordAccessor, Type, TypeConstructor, TypeValueConstructor,
+        TypeVar, ValueConstructor, ValueConstructorVariant,
     },
 };
 use std::{collections::HashMap, ops::Deref, sync::Arc};
@@ -138,12 +138,20 @@ impl<'a> ModuleEncoder<'a> {
 
     fn build_types_constructors_mapping(
         &mut self,
-        mut builder: capnp::text_list::Builder<'_>,
-        constructors: &[SmolStr],
+        mut builder: capnp::struct_list::Builder<'_, type_value_constructor::Owned>,
+        constructors: &[TypeValueConstructor],
     ) {
-        for (i, s) in constructors.iter().enumerate() {
-            builder.set(i as u32, s);
+        for (i, constructor) in constructors.iter().enumerate() {
+            self.build_type_value_constructor(builder.reborrow().get(i as u32), constructor);
         }
+    }
+
+    fn build_type_value_constructor(
+        &mut self,
+        mut builder: type_value_constructor::Builder<'_>,
+        constructor: &TypeValueConstructor,
+    ) {
+        builder.set_name(&constructor.name);
     }
 
     fn build_value_constructor(
