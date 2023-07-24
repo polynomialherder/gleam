@@ -41,7 +41,10 @@ mod tests;
 use self::pattern::{Constructor, Pattern, PatternId};
 use crate::{
     ast::AssignName,
-    type_::{collapse_links, is_prelude_module, ModuleInterface, Type, TypeValueConstructor},
+    type_::{
+        collapse_links, environment, is_prelude_module, Environment, ModuleInterface, Type,
+        TypeValueConstructor,
+    },
 };
 use id_arena::Arena;
 use itertools::Itertools;
@@ -225,28 +228,27 @@ pub struct Diagnostics {
 pub struct Match {
     pub tree: Decision,
     pub diagnostics: Diagnostics,
-    pub modules: im::HashMap<SmolStr, ModuleInterface>,
 }
 
 impl Match {
-    pub fn missing_patterns(&self) -> Vec<SmolStr> {
-        missing_patterns::missing_patterns(self)
+    pub fn missing_patterns(&self, environment: &Environment<'_>) -> Vec<SmolStr> {
+        missing_patterns::missing_patterns(self, environment)
     }
 }
 
 /// The `match` compiler itself (shocking, I know).
 #[derive(Debug)]
-pub struct Compiler {
+pub struct Compiler<'a> {
     variable_id: usize,
     diagnostics: Diagnostics,
     patterns: Arena<Pattern>,
-    modules: im::HashMap<SmolStr, ModuleInterface>,
+    environment: &'a Environment<'a>,
 }
 
-impl Compiler {
-    pub fn new(modules: im::HashMap<SmolStr, ModuleInterface>, patterns: Arena<Pattern>) -> Self {
+impl<'a> Compiler<'a> {
+    pub fn new(environment: &'a Environment<'a>, patterns: Arena<Pattern>) -> Self {
         Self {
-            modules,
+            environment,
             patterns,
             variable_id: 0,
             diagnostics: Diagnostics {
@@ -260,7 +262,6 @@ impl Compiler {
         Match {
             tree: self.compile_rows(rows),
             diagnostics: self.diagnostics,
-            modules: self.modules,
         }
     }
 
@@ -772,13 +773,14 @@ impl Compiler {
             .collect()
     }
 
-    fn custom_type_info(&self, module: &str, name: &str) -> Option<&[TypeValueConstructor]> {
-        self.modules
-            .get(module)?
-            .types_value_constructors
-            .get(name)
-            .as_ref()
-            .map(|c| c.as_slice())
+    fn custom_type_info(
+        &self,
+        module: &SmolStr,
+        name: &SmolStr,
+    ) -> Option<&Vec<TypeValueConstructor>> {
+        self.environment
+            .get_constructors_for_type(module, name)
+            .ok()
     }
 }
 

@@ -903,7 +903,7 @@ impl<'a, 'b> ExprTyper<'a, 'b> {
         }
 
         // TODO: check exhaustive
-        // self.check_case_exhaustiveness_new(&subject_types, &typed_clauses)?;
+        self.check_case_exhaustiveness_new(&subject_types, &typed_clauses)?;
 
         Ok(TypedExpr::Case {
             location,
@@ -2171,7 +2171,7 @@ impl<'a, 'b> ExprTyper<'a, 'b> {
     ) -> Result<(), Error> {
         use exhaustiveness::{Body, Column, Compiler, PatternArena, Row};
 
-        let mut compiler = Compiler::new(self.environment.importable_modules.clone(), Arena::new());
+        let mut compiler = Compiler::new(self.environment, Arena::new());
         let mut arena = PatternArena::new();
 
         let subject_variables = subject_types

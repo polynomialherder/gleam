@@ -3,16 +3,16 @@ use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
 use smol_str::SmolStr;
 
-use crate::type_::{Type, TypeValueConstructor};
+use crate::type_::{environment::Environment, Type, TypeValueConstructor};
 
 use super::{Constructor, Decision, Match, Variable};
 
 /// Returns a list of patterns not covered by the match expression.
-pub fn missing_patterns(matches: &Match) -> Vec<SmolStr> {
+pub fn missing_patterns(matches: &Match, environment: &Environment<'_>) -> Vec<SmolStr> {
     let mut names = HashSet::new();
     let mut steps = Vec::new();
 
-    add_missing_patterns(matches, &matches.tree, &mut steps, &mut names);
+    add_missing_patterns(matches, &matches.tree, &mut steps, &mut names, environment);
 
     let mut missing: Vec<SmolStr> = names.into_iter().collect();
 
@@ -133,6 +133,7 @@ fn add_missing_patterns(
     node: &Decision,
     terms: &mut Vec<Term>,
     missing: &mut HashSet<SmolStr>,
+    environment: &Environment<'_>,
 ) {
     match node {
         Decision::Success(_) => {}
@@ -166,7 +167,7 @@ fn add_missing_patterns(
         }
 
         Decision::Guard(_, _, fallback) => {
-            add_missing_patterns(matches, fallback, terms, missing);
+            add_missing_patterns(matches, fallback, terms, missing, environment);
         }
 
         Decision::Switch(variable, cases, fallback) => {
@@ -192,7 +193,10 @@ fn add_missing_patterns(
                     }
 
                     Constructor::Variant(type_, index) => {
-                        let name = custom_type_info(matches, type_)
+                        let (module, name) =
+                            type_.named_type_name().expect("Should be a named type");
+                        let name = environment
+                            .get_constructors_for_type(&module, &name)
                             .expect("Custom type constructor must have custom type kind")
                             .get(*index)
                             .expect("Custom type constructor exist for type")
@@ -206,12 +210,12 @@ fn add_missing_patterns(
                     }
                 }
 
-                add_missing_patterns(matches, &case.body, terms, missing);
+                add_missing_patterns(matches, &case.body, terms, missing, environment);
                 _ = terms.pop();
             }
 
             if let Some(node) = fallback {
-                add_missing_patterns(matches, node, terms, missing);
+                add_missing_patterns(matches, node, terms, missing, environment);
             }
         }
 
@@ -223,7 +227,7 @@ fn add_missing_patterns(
             terms.push(Term::EmptyList {
                 variable: variable.clone(),
             });
-            add_missing_patterns(matches, empty, terms, missing);
+            add_missing_patterns(matches, empty, terms, missing, environment);
             _ = terms.pop();
 
             terms.push(Term::List {
@@ -231,17 +235,8 @@ fn add_missing_patterns(
                 first: non_empty.first.clone(),
                 rest: non_empty.rest.clone(),
             });
-            add_missing_patterns(matches, &non_empty.decision, terms, missing);
+            add_missing_patterns(matches, &non_empty.decision, terms, missing, environment);
             _ = terms.pop();
         }
     }
-}
-
-fn custom_type_info<'a>(matches: &'a Match, type_: &Type) -> Option<&'a Vec<TypeValueConstructor>> {
-    let (module, name) = type_.named_type_name()?;
-    matches
-        .modules
-        .get(&module)?
-        .types_value_constructors
-        .get(&name)
 }

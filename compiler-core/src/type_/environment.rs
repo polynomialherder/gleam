@@ -281,11 +281,16 @@ impl<'a> Environment<'a> {
     /// Lookup constructors for type in the current scope.
     ///
     pub fn get_constructors_for_type(
-        &mut self,
-        full_module_name: Option<&str>,
+        &self,
+        module: &SmolStr,
         name: &SmolStr,
     ) -> Result<&Vec<TypeValueConstructor>, UnknownTypeConstructorError> {
-        match full_module_name {
+        let module = if module.is_empty() || module == self.current_module {
+            None
+        } else {
+            Some(module)
+        };
+        match module {
             None => self.module_types_constructors.get(name).ok_or_else(|| {
                 UnknownTypeConstructorError::Type {
                     name: name.clone(),
@@ -300,7 +305,6 @@ impl<'a> Environment<'a> {
                         imported_modules: self.importable_modules.keys().cloned().collect(),
                     }
                 })?;
-                let _ = self.unused_modules.remove(m);
                 module.types_value_constructors.get(name).ok_or_else(|| {
                     UnknownTypeConstructorError::ModuleType {
                         name: name.clone(),
@@ -540,13 +544,7 @@ impl<'a> Environment<'a> {
                 module: module_name,
                 ..
             } => {
-                let m = if module_name.is_empty() || module_name == self.current_module {
-                    None
-                } else {
-                    Some(module_name.as_str())
-                };
-
-                if let Ok(constructors) = self.get_constructors_for_type(m, type_name) {
+                if let Ok(constructors) = self.get_constructors_for_type(module_name, type_name) {
                     let mut unmatched_constructors: HashSet<SmolStr> =
                         constructors.iter().map(|e| e.name.clone()).collect();
 
