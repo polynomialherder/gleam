@@ -12,7 +12,7 @@ struct Setup {
 impl Setup {
     fn new() -> Self {
         Self {
-            compiler: Compiler::new(HashMap::new(), Arena::new()),
+            compiler: Compiler::new(im::HashMap::new(), Arena::new()),
         }
     }
 }

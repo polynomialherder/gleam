@@ -51,6 +51,8 @@ use std::{
     sync::Arc,
 };
 
+pub use self::pattern::PatternArena;
+
 /// The body of code to evaluate in case of a match.
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Body {
@@ -61,6 +63,15 @@ pub struct Body {
 
     /// The index of the clause in the case expression that should be run.
     clause_index: u16,
+}
+
+impl Body {
+    pub fn new(clause_index: u16) -> Self {
+        Self {
+            bindings: vec![],
+            clause_index,
+        }
+    }
 }
 
 /// A variable used in a match expression.
@@ -82,7 +93,7 @@ pub struct Row {
 }
 
 impl Row {
-    fn new(columns: Vec<Column>, guard: Option<usize>, body: Body) -> Self {
+    pub fn new(columns: Vec<Column>, guard: Option<usize>, body: Body) -> Self {
         Self {
             columns,
             guard,
@@ -110,7 +121,7 @@ pub struct Column {
 }
 
 impl Column {
-    fn new(variable: Variable, pattern: PatternId) -> Self {
+    pub fn new(variable: Variable, pattern: PatternId) -> Self {
         Self { variable, pattern }
     }
 }
@@ -151,7 +162,7 @@ impl Case {
     }
 }
 
-/// A decision tree compiled from a list of match cases.
+/// A decision tree
 #[derive(Eq, PartialEq, Debug)]
 pub enum Decision {
     /// A pattern is matched and the right-hand value is to be returned.
@@ -214,7 +225,7 @@ pub struct Diagnostics {
 pub struct Match {
     pub tree: Decision,
     pub diagnostics: Diagnostics,
-    pub modules: HashMap<SmolStr, ModuleInterface>,
+    pub modules: im::HashMap<SmolStr, ModuleInterface>,
 }
 
 impl Match {
@@ -229,11 +240,11 @@ pub struct Compiler {
     variable_id: usize,
     diagnostics: Diagnostics,
     patterns: Arena<Pattern>,
-    modules: HashMap<SmolStr, ModuleInterface>,
+    modules: im::HashMap<SmolStr, ModuleInterface>,
 }
 
 impl Compiler {
-    pub fn new(modules: HashMap<SmolStr, ModuleInterface>, patterns: Arena<Pattern>) -> Self {
+    pub fn new(modules: im::HashMap<SmolStr, ModuleInterface>, patterns: Arena<Pattern>) -> Self {
         Self {
             modules,
             patterns,
@@ -251,6 +262,10 @@ impl Compiler {
             diagnostics: self.diagnostics,
             modules: self.modules,
         }
+    }
+
+    pub fn set_pattern_arena(&mut self, arena: Arena<Pattern>) {
+        self.patterns = arena;
     }
 
     fn pattern(&self, id: PatternId) -> &Pattern {
@@ -740,7 +755,7 @@ impl Compiler {
     ///
     /// In a real compiler you'd have to ensure these variables don't conflict
     /// with other variables.
-    fn new_variable(&mut self, type_: Arc<Type>) -> Variable {
+    pub fn new_variable(&mut self, type_: Arc<Type>) -> Variable {
         let var = Variable {
             id: self.variable_id,
             type_,
