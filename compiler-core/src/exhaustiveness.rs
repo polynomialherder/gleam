@@ -42,8 +42,8 @@ use self::pattern::{Constructor, Pattern, PatternId};
 use crate::{
     ast::AssignName,
     type_::{
-        collapse_links, environment, is_prelude_module, Environment, ModuleInterface, Type,
-        TypeValueConstructor,
+        collapse_links, environment, error::UnknownTypeConstructorError, is_prelude_module,
+        Environment, ModuleInterface, Type, TypeValueConstructor,
     },
 };
 use id_arena::Arena;
@@ -780,10 +780,8 @@ impl<'a> Compiler<'a> {
         &self,
         module: &SmolStr,
         name: &SmolStr,
-    ) -> Option<&Vec<TypeValueConstructor>> {
-        self.environment
-            .get_constructors_for_type(module, name)
-            .ok()
+    ) -> Result<&Vec<TypeValueConstructor>, UnknownTypeConstructorError> {
+        self.environment.get_constructors_for_type(module, name)
     }
 }
 

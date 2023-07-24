@@ -327,6 +327,13 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
                         public: true,
                     },
                 );
+                let _ = prelude.types_value_constructors.insert(
+                    NIL.into(),
+                    vec![TypeValueConstructor {
+                        name: "Nil".into(),
+                        parameters: vec![],
+                    }],
+                );
             }
 
             PreludeType::Result => {
