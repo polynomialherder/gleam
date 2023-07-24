@@ -41,7 +41,7 @@ mod tests;
 use self::pattern::{Constructor, Pattern, PatternId};
 use crate::{
     ast::AssignName,
-    type_::{collapse_links, is_prelude_module, Type},
+    type_::{collapse_links, is_prelude_module, Type, TypeValueConstructor},
 };
 use id_arena::Arena;
 use itertools::Itertools;
@@ -223,14 +223,9 @@ impl Match {
     }
 }
 
-#[derive(Debug)]
-pub struct CustomTypeInfo {
-    pub constructors: Vec<(SmolStr, Vec<Arc<Type>>)>,
-}
-
 #[derive(Debug, Default)]
 pub struct ModuleInfo {
-    pub custom_types: HashMap<SmolStr, CustomTypeInfo>,
+    pub custom_types: HashMap<SmolStr, Vec<TypeValueConstructor>>,
 }
 
 /// The `match` compiler itself (shocking, I know).
@@ -336,9 +331,10 @@ impl Compiler {
                 let cases = variants
                     .iter()
                     .enumerate()
-                    .map(|(idx, (_, args))| {
+                    .map(|(idx, constructor)| {
                         let variant = Constructor::Variant(variable.type_.clone(), idx);
-                        (variant, self.new_variables(args), Vec::new())
+                        let new_variables = self.new_variables(&constructor.parameters);
+                        (variant, new_variables, Vec::new())
                     })
                     .collect();
                 let cases = self.compile_constructor_cases(rows, variable.clone(), cases);
@@ -727,8 +723,7 @@ impl Compiler {
                 let constructors = self
                     .custom_type_info(module, name)
                     .expect("Custom type variants must exist")
-                    .constructors
-                    .clone();
+                    .to_vec();
                 BranchMode::CustomType {
                     variable,
                     constructors,
@@ -767,8 +762,13 @@ impl Compiler {
             .collect()
     }
 
-    fn custom_type_info(&self, module: &str, name: &str) -> Option<&CustomTypeInfo> {
-        self.modules.get(module)?.custom_types.get(name)
+    fn custom_type_info(&self, module: &str, name: &str) -> Option<&[TypeValueConstructor]> {
+        self.modules
+            .get(module)?
+            .custom_types
+            .get(name)
+            .as_ref()
+            .map(|c| c.as_slice())
     }
 }
 
@@ -787,6 +787,6 @@ enum BranchMode {
     },
     CustomType {
         variable: Variable,
-        constructors: Vec<(SmolStr, Vec<Arc<Type>>)>,
+        constructors: Vec<TypeValueConstructor>,
     },
 }

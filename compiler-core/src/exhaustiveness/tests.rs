@@ -22,7 +22,7 @@ impl Setup {
         &mut self,
         module: &str,
         name: &str,
-        constructors: Vec<(SmolStr, Vec<Arc<Type>>)>,
+        constructors: Vec<TypeValueConstructor>,
     ) -> Arc<Type> {
         self.insert_constructors(module, name, constructors);
         type_::named(module, name, true, vec![])
@@ -32,7 +32,7 @@ impl Setup {
         &mut self,
         module: &str,
         name: &str,
-        constructors: Vec<(SmolStr, Vec<Arc<Type>>)>,
+        constructors: Vec<TypeValueConstructor>,
     ) {
         _ = self
             .compiler
@@ -40,14 +40,20 @@ impl Setup {
             .entry(module.into())
             .or_default()
             .custom_types
-            .insert(name.into(), CustomTypeInfo { constructors });
+            .insert(name.into(), constructors);
     }
 
     fn insert_custom_list_type(&mut self, element_type: Arc<Type>) -> Arc<Type> {
         let list_type = type_::named("wibble", "List", true, vec![element_type.clone()]);
         let constructors = vec![
-            ("Empty".into(), Vec::new()),
-            ("NonEmpty".into(), vec![element_type, list_type.clone()]),
+            TypeValueConstructor {
+                name: "Empty".into(),
+                parameters: Vec::new(),
+            },
+            TypeValueConstructor {
+                name: "NonEmpty".into(),
+                parameters: vec![element_type.clone(), list_type.clone()],
+            },
         ];
         self.insert_constructors("wibble", "List", constructors);
         list_type
@@ -775,8 +781,14 @@ fn nonexhaustive_option_type() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let input = setup.new_variable(option_type.clone());
@@ -822,8 +834,14 @@ fn nonexhaustive_option_type_with_multiple_arguments() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone(), int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone(), int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let int4 = setup.int("4");
@@ -884,8 +902,14 @@ fn exhaustive_option_type() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let var_1 = setup.var(1, int_type);
@@ -930,8 +954,14 @@ fn redundant_option_type_with_bool() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let int1 = setup.int("1");
@@ -981,8 +1011,14 @@ fn redundant_option_type_with_int() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let input = setup.new_variable(option_type.clone());
@@ -1032,8 +1068,14 @@ fn exhaustive_option_type_with_binding() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let input = setup.new_variable(option_type.clone());
@@ -1087,8 +1129,14 @@ fn nonexhaustive_pair_in_option_pattern() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![tup_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![tup_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let input = setup.new_variable(option_type.clone());
@@ -1222,8 +1270,14 @@ fn nonexhaustive_option_with_two_rows_and_guard() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: Vec::new(),
+            },
         ],
     );
     let int_4 = setup.int("4");
@@ -1455,8 +1509,14 @@ fn exhaustive_option_with_guard() {
         "gleam/option",
         "Option",
         vec![
-            ("Some".into(), vec![int_type.clone()]),
-            ("None".into(), Vec::new()),
+            TypeValueConstructor {
+                name: "Some".into(),
+                parameters: vec![int_type.clone()],
+            },
+            TypeValueConstructor {
+                name: "None".into(),
+                parameters: vec![],
+            },
         ],
     );
     let bind_a = setup.bind("a");

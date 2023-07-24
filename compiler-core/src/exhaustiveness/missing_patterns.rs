@@ -3,9 +3,9 @@ use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
 use smol_str::SmolStr;
 
-use crate::type_::Type;
+use crate::type_::{Type, TypeValueConstructor};
 
-use super::{Constructor, CustomTypeInfo, Decision, Match, Variable};
+use super::{Constructor, Decision, Match, Variable};
 
 /// Returns a list of patterns not covered by the match expression.
 pub fn missing_patterns(matches: &Match) -> Vec<SmolStr> {
@@ -194,10 +194,9 @@ fn add_missing_patterns(
                     Constructor::Variant(type_, index) => {
                         let name = custom_type_info(matches, type_)
                             .expect("Custom type constructor must have custom type kind")
-                            .constructors
                             .get(*index)
                             .expect("Custom type constructor exist for type")
-                            .0
+                            .name
                             .clone();
                         terms.push(Term::Variant {
                             variable: variable.clone(),
@@ -238,7 +237,7 @@ fn add_missing_patterns(
     }
 }
 
-fn custom_type_info<'a>(matches: &'a Match, type_: &Type) -> Option<&'a CustomTypeInfo> {
+fn custom_type_info<'a>(matches: &'a Match, type_: &Type) -> Option<&'a Vec<TypeValueConstructor>> {
     let (module, name) = type_.named_type_name()?;
     matches.modules.get(&module)?.custom_types.get(&name)
 }
