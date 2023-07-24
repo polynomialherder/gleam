@@ -500,6 +500,13 @@ fn infer_module_type_retention_test() {
                             parameters: vec![generic_var(2)]
                         }
                     ]
+                ),
+                (
+                    "Nil".into(),
+                    vec![TypeValueConstructor {
+                        name: "Nil".into(),
+                        parameters: vec![]
+                    },]
                 )
             ]),
             values: HashMap::new(),
