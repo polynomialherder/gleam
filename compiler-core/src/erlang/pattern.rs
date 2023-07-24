@@ -48,7 +48,7 @@ fn print<'a>(
 
         Pattern::Constructor {
             arguments: args,
-            constructor: Inferred::Known(PatternConstructor::Record { name, .. }),
+            constructor: Inferred::Known(PatternConstructor { name, .. }),
             ..
         } => tag_tuple_pattern(name, args, vars, define_variables, env),
 

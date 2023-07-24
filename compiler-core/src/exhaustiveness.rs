@@ -343,7 +343,10 @@ impl<'a> Compiler<'a> {
                     .iter()
                     .enumerate()
                     .map(|(idx, constructor)| {
-                        let variant = Constructor::Variant(variable.type_.clone(), idx);
+                        let variant = Constructor::Variant {
+                            type_: variable.type_.clone(),
+                            index: idx as u16,
+                        };
                         let new_variables = self.new_variables(&constructor.parameters);
                         (variant, new_variables, Vec::new())
                     })
@@ -530,7 +533,7 @@ impl<'a> Compiler<'a> {
                 let index = cons.index();
                 let mut columns = row.columns;
 
-                let case = cases.get_mut(index).expect("Case must exist");
+                let case = cases.get_mut(index as usize).expect("Case must exist");
                 for (var, pattern) in case.1.iter().zip(args.into_iter()) {
                     columns.push(Column::new(var.clone(), pattern));
                 }

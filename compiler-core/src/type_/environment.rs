@@ -566,8 +566,7 @@ impl<'a> Environment<'a> {
 
                             // If the pattern is a constructor, remove it from unmatched patterns
                             Pattern::Constructor {
-                                constructor:
-                                    Inferred::Known(PatternConstructor::Record { name, .. }),
+                                constructor: Inferred::Known(PatternConstructor { name, .. }),
                                 ..
                             } => {
                                 let _ = unmatched_constructors.remove(name);

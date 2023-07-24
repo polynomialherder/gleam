@@ -348,7 +348,7 @@ impl<'module_ctx, 'expression_gen, 'a> Generator<'module_ctx, 'expression_gen, '
 
             Pattern::Constructor {
                 type_,
-                constructor: Inferred::Known(PatternConstructor::Record { name, .. }),
+                constructor: Inferred::Known(PatternConstructor { name, .. }),
                 ..
             } if type_.is_bool() && name == "True" => {
                 self.push_booly_check(subject.clone(), true);
@@ -357,7 +357,7 @@ impl<'module_ctx, 'expression_gen, 'a> Generator<'module_ctx, 'expression_gen, '
 
             Pattern::Constructor {
                 type_,
-                constructor: Inferred::Known(PatternConstructor::Record { name, .. }),
+                constructor: Inferred::Known(PatternConstructor { name, .. }),
                 ..
             } if type_.is_bool() && name == "False" => {
                 self.push_booly_check(subject.clone(), false);
@@ -366,7 +366,7 @@ impl<'module_ctx, 'expression_gen, 'a> Generator<'module_ctx, 'expression_gen, '
 
             Pattern::Constructor {
                 type_,
-                constructor: Inferred::Known(PatternConstructor::Record { .. }),
+                constructor: Inferred::Known(PatternConstructor { .. }),
                 ..
             } if type_.is_nil() => {
                 self.push_booly_check(subject.clone(), false);
@@ -396,7 +396,7 @@ impl<'module_ctx, 'expression_gen, 'a> Generator<'module_ctx, 'expression_gen, '
 
             Pattern::Constructor {
                 constructor:
-                    Inferred::Known(PatternConstructor::Record {
+                    Inferred::Known(PatternConstructor {
                         field_map,
                         name: record_name,
                         ..

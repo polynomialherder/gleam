@@ -305,6 +305,7 @@ pub enum ValueConstructorVariant {
         module: SmolStr,
         constructors_count: u16,
         documentation: Option<SmolStr>,
+        constructor_index: u16,
     },
 }
 
@@ -539,31 +540,25 @@ impl ModuleInterface {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PatternConstructor {
-    Record {
-        name: SmolStr,
-        field_map: Option<FieldMap>,
-        documentation: Option<SmolStr>,
-        module: Option<SmolStr>,
-        location: SrcSpan,
-    },
+pub struct PatternConstructor {
+    pub name: SmolStr,
+    pub field_map: Option<FieldMap>,
+    pub documentation: Option<SmolStr>,
+    pub module: Option<SmolStr>,
+    pub location: SrcSpan,
+    pub constructor_index: u16,
 }
+
 impl PatternConstructor {
     pub fn definition_location(&self) -> Option<DefinitionLocation<'_>> {
-        match self {
-            PatternConstructor::Record {
-                module, location, ..
-            } => Some(DefinitionLocation {
-                module: Some(module.as_deref()?),
-                span: *location,
-            }),
-        }
+        Some(DefinitionLocation {
+            module: Some(self.module.as_deref()?),
+            span: self.location,
+        })
     }
 
     pub fn get_documentation(&self) -> Option<&str> {
-        match self {
-            PatternConstructor::Record { documentation, .. } => documentation.as_deref(),
-        }
+        self.documentation.as_deref()
     }
 }
 

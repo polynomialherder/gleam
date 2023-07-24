@@ -192,13 +192,13 @@ fn add_missing_patterns(
                         });
                     }
 
-                    Constructor::Variant(type_, index) => {
+                    Constructor::Variant { type_, index } => {
                         let (module, name) =
                             type_.named_type_name().expect("Should be a named type");
                         let name = environment
                             .get_constructors_for_type(&module, &name)
                             .expect("Custom type constructor must have custom type kind")
-                            .get(*index)
+                            .get(*index as usize)
                             .expect("Custom type constructor exist for type")
                             .name
                             .clone();

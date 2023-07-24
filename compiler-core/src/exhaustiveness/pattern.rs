@@ -62,7 +62,7 @@ pub enum Constructor {
     Float(SmolStr),
     Tuple(Vec<Arc<Type>>),
     String(SmolStr),
-    Variant(Arc<Type>, usize),
+    Variant { type_: Arc<Type>, index: u16 },
     // TODO: Generate a decision tree for this
     BitString,
     // TODO: Generate a decision tree for this
@@ -71,7 +71,7 @@ pub enum Constructor {
 
 impl Constructor {
     /// Returns the index of this constructor relative to its type.
-    pub fn index(&self) -> usize {
+    pub fn index(&self) -> u16 {
         match self {
             Constructor::Int(_)
             | Constructor::Float(_)
@@ -80,7 +80,7 @@ impl Constructor {
             | Constructor::BitString
             | Constructor::StringPrefix => 0,
 
-            Constructor::Variant(_, index) => *index,
+            Constructor::Variant { index, .. } => *index,
         }
     }
 }
@@ -161,10 +161,10 @@ impl PatternArena {
                 type_,
                 ..
             } => {
-                // TODO: This is using the arguments to get the arity. This may
-                // not be correct as it could be using a spread. Will need to
-                // get it either from the field map or the type.
-                let constructor = Constructor::Variant(type_.clone(), arguments.len());
+                let constructor = Constructor::Variant {
+                    type_: type_.clone(),
+                    index: constructor.expect_ref("must be inferred").constructor_index,
+                };
                 // TODO: The arguments may not be given in the same order as the
                 // definition if labels are used. We need to check if that is
                 // the case (or if it has been expanded during earlier type

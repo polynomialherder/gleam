@@ -78,6 +78,7 @@ fn compile_expression(src: &str) -> TypedStatement {
             fields: [("name".into(), 0), ("age".into(), 1)].into(),
         }),
         module: "mymod".into(),
+        constructor_index: 0,
     };
     environment.insert_variable(
         "Cat".into(),
@@ -473,6 +474,7 @@ fn find_node_bool() {
                 field_map: None,
                 location: SrcSpan { start: 0, end: 0 },
                 module: PRELUDE_MODULE_NAME.into(),
+                constructor_index: 0,
             },
             type_: type_::bool(),
         },

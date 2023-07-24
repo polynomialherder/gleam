@@ -421,6 +421,7 @@ fn record_value() {
                         start: random.gen(),
                         end: random.gen(),
                     },
+                    constructor_index: random.gen(),
                 },
             },
         )]
@@ -456,6 +457,7 @@ fn record_value_with_field_map() {
                     }),
                     arity: random.gen(),
                     constructors_count: random.gen(),
+                    constructor_index: random.gen(),
                     location: SrcSpan {
                         start: random.gen(),
                         end: random.gen(),

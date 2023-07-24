@@ -109,6 +109,7 @@ struct ValueConstructorVariant {
       module @12 :Text;
       constructorsCount @13 :UInt16;
       documentation @16 :Text;
+      constructorIndex @17 :UInt16;
     }
   }
 }

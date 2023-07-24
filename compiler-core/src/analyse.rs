@@ -47,6 +47,14 @@ impl<T> Inferred<T> {
         }
         .expect(message)
     }
+
+    pub fn expect_ref(&self, message: &str) -> &T {
+        match self {
+            Inferred::Known(value) => Some(value),
+            Inferred::Unknown => None,
+        }
+        .expect(message)
+    }
 }
 
 impl Inferred<PatternConstructor> {
@@ -504,7 +512,7 @@ fn register_values_from_custom_type(
 
     let mut constructors_data = vec![];
 
-    for constructor in constructors {
+    for (index, constructor) in constructors.iter().enumerate() {
         assert_unique_name(names, &constructor.name, constructor.location)?;
 
         let mut field_map = FieldMap::new(constructor.arguments.len() as u32);
@@ -536,6 +544,7 @@ fn register_values_from_custom_type(
             field_map: field_map.clone(),
             location: constructor.location,
             module: module_name.clone(),
+            constructor_index: index as u16,
         };
 
         environment.insert_module_value(

@@ -2474,6 +2474,7 @@ pub mod value_constructor_variant {
       self.builder.get_pointer_field(3).clear();
       self.builder.set_data_field::<u16>(2, 0u16);
       self.builder.get_pointer_field(4).clear();
+      self.builder.set_data_field::<u16>(3, 0u16);
       ::capnp::traits::FromStructBuilder::new(self.builder)
     }
     #[inline]
@@ -3080,6 +3081,10 @@ pub mod value_constructor_variant {
       pub fn has_documentation(&self) -> bool {
         !self.reader.get_pointer_field(4).is_null()
       }
+      #[inline]
+      pub fn get_constructor_index(self) -> u16 {
+        self.reader.get_data_field::<u16>(3)
+      }
     }
 
     pub struct Builder<'a> { builder: ::capnp::private::layout::StructBuilder<'a> }
@@ -3225,6 +3230,14 @@ pub mod value_constructor_variant {
       #[inline]
       pub fn has_documentation(&self) -> bool {
         !self.builder.get_pointer_field(4).is_null()
+      }
+      #[inline]
+      pub fn get_constructor_index(self) -> u16 {
+        self.builder.get_data_field::<u16>(3)
+      }
+      #[inline]
+      pub fn set_constructor_index(&mut self, value: u16)  {
+        self.builder.set_data_field::<u16>(3, value);
       }
     }
 

@@ -205,6 +205,7 @@ impl<'a> ModuleEncoder<'a> {
                 location,
                 module,
                 constructors_count,
+                constructor_index,
                 documentation: doc,
             } => {
                 let mut builder = builder.init_record();
@@ -213,6 +214,7 @@ impl<'a> ModuleEncoder<'a> {
                 builder.set_arity(*arity);
                 builder.set_documentation(doc.as_ref().map(SmolStr::as_str).unwrap_or_default());
                 builder.set_constructors_count(*constructors_count);
+                builder.set_constructor_index(*constructor_index);
                 self.build_optional_field_map(builder.reborrow().init_field_map(), field_map);
                 self.build_src_span(builder.init_location(), *location);
             }

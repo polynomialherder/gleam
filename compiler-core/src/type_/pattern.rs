@@ -501,13 +501,15 @@ impl<'a, 'b> PatternTyper<'a, 'b> {
                         documentation,
                         module,
                         location,
+                        constructor_index,
                         ..
-                    } => PatternConstructor::Record {
+                    } => PatternConstructor {
                         documentation: documentation.clone(),
                         name: name.clone(),
                         field_map: cons.field_map().cloned(),
                         module: Some(module.clone()),
                         location: *location,
+                        constructor_index: *constructor_index,
                     },
                     ValueConstructorVariant::LocalVariable { .. }
                     | ValueConstructorVariant::ModuleConstant { .. }

@@ -420,6 +420,7 @@ impl ModuleDecoder {
             field_map: self.field_map(&reader.get_field_map()?)?,
             location: self.src_span(&reader.get_location()?)?,
             documentation: self.optional_string(reader.get_documentation()?),
+            constructor_index: reader.get_constructor_index(),
         })
     }
 
