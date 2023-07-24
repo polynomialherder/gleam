@@ -468,6 +468,18 @@ pub struct TypeValueConstructor {
 }
 
 impl ModuleInterface {
+    pub fn new(name: SmolStr, origin: Origin, package: SmolStr) -> Self {
+        Self {
+            name,
+            origin,
+            package,
+            types: Default::default(),
+            types_value_constructors: Default::default(),
+            values: Default::default(),
+            accessors: Default::default(),
+        }
+    }
+
     pub fn get_public_value(&self, name: &str) -> Option<&ValueConstructor> {
         let value = self.values.get(name)?;
         if value.public {

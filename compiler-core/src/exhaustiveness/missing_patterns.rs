@@ -239,5 +239,9 @@ fn add_missing_patterns(
 
 fn custom_type_info<'a>(matches: &'a Match, type_: &Type) -> Option<&'a Vec<TypeValueConstructor>> {
     let (module, name) = type_.named_type_name()?;
-    matches.modules.get(&module)?.custom_types.get(&name)
+    matches
+        .modules
+        .get(&module)?
+        .types_value_constructors
+        .get(&name)
 }

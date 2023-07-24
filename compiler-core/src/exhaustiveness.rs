@@ -41,7 +41,7 @@ mod tests;
 use self::pattern::{Constructor, Pattern, PatternId};
 use crate::{
     ast::AssignName,
-    type_::{collapse_links, is_prelude_module, Type, TypeValueConstructor},
+    type_::{collapse_links, is_prelude_module, ModuleInterface, Type, TypeValueConstructor},
 };
 use id_arena::Arena;
 use itertools::Itertools;
@@ -214,7 +214,7 @@ pub struct Diagnostics {
 pub struct Match {
     pub tree: Decision,
     pub diagnostics: Diagnostics,
-    pub modules: HashMap<SmolStr, ModuleInfo>,
+    pub modules: HashMap<SmolStr, ModuleInterface>,
 }
 
 impl Match {
@@ -223,22 +223,17 @@ impl Match {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct ModuleInfo {
-    pub custom_types: HashMap<SmolStr, Vec<TypeValueConstructor>>,
-}
-
 /// The `match` compiler itself (shocking, I know).
 #[derive(Debug)]
 pub struct Compiler {
     variable_id: usize,
     diagnostics: Diagnostics,
     patterns: Arena<Pattern>,
-    modules: HashMap<SmolStr, ModuleInfo>,
+    modules: HashMap<SmolStr, ModuleInterface>,
 }
 
 impl Compiler {
-    pub fn new(modules: HashMap<SmolStr, ModuleInfo>, patterns: Arena<Pattern>) -> Self {
+    pub fn new(modules: HashMap<SmolStr, ModuleInterface>, patterns: Arena<Pattern>) -> Self {
         Self {
             modules,
             patterns,
@@ -765,7 +760,7 @@ impl Compiler {
     fn custom_type_info(&self, module: &str, name: &str) -> Option<&[TypeValueConstructor]> {
         self.modules
             .get(module)?
-            .custom_types
+            .types_value_constructors
             .get(name)
             .as_ref()
             .map(|c| c.as_slice())

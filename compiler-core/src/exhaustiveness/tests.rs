@@ -1,7 +1,7 @@
 use std::hash::Hash;
 
 use super::*;
-use crate::{ast::AssignName, type_};
+use crate::{ast::AssignName, build::Origin, type_};
 use id_arena::Arena;
 
 #[derive(Debug)]
@@ -38,8 +38,10 @@ impl Setup {
             .compiler
             .modules
             .entry(module.into())
-            .or_default()
-            .custom_types
+            .or_insert_with(|| {
+                ModuleInterface::new(module.into(), Origin::Src, "my_package".into())
+            })
+            .types_value_constructors
             .insert(name.into(), constructors);
     }
 
