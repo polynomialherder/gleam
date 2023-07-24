@@ -181,7 +181,7 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
         package: "".into(),
         origin: Origin::Src,
         types: HashMap::new(),
-        types_constructors: HashMap::new(),
+        types_value_constructors: HashMap::new(),
         values: HashMap::new(),
         accessors: HashMap::new(),
     };
@@ -203,7 +203,7 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
 
             PreludeType::Bool => {
                 let _ = prelude
-                    .types_constructors
+                    .types_value_constructors
                     .insert(BOOL.into(), vec!["True".into(), "False".into()]);
                 let _ = prelude.values.insert(
                     "True".into(),
@@ -329,7 +329,7 @@ pub fn build_prelude(ids: &UniqueIdGenerator) -> ModuleInterface {
                     },
                 );
                 let _ = prelude
-                    .types_constructors
+                    .types_value_constructors
                     .insert(RESULT.into(), vec!["Ok".into(), "Error".into()]);
                 let ok = generic_var(ids.next());
                 let error = generic_var(ids.next());

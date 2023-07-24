@@ -474,7 +474,7 @@ fn infer_module_type_retention_test() {
             name: "ok".into(),
             // Core type constructors like String and Int are not included
             types: HashMap::new(),
-            types_constructors: HashMap::from([
+            types_value_constructors: HashMap::from([
                 ("Bool".into(), vec!["True".into(), "False".into()]),
                 ("Result".into(), vec!["Ok".into(), "Error".into()])
             ]),

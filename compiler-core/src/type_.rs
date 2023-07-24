@@ -456,7 +456,7 @@ pub struct ModuleInterface {
     pub origin: Origin,
     pub package: SmolStr,
     pub types: HashMap<SmolStr, TypeConstructor>,
-    pub types_constructors: HashMap<SmolStr, Vec<SmolStr>>,
+    pub types_value_constructors: HashMap<SmolStr, Vec<SmolStr>>,
     pub values: HashMap<SmolStr, ValueConstructor>,
     pub accessors: HashMap<SmolStr, AccessorsMap>,
 }

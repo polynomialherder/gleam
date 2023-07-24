@@ -212,7 +212,7 @@ pub fn infer_module(
         type_info: ModuleInterface {
             name,
             types,
-            types_constructors,
+            types_value_constructors: types_constructors,
             values,
             accessors,
             origin,

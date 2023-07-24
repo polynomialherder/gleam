@@ -68,7 +68,7 @@ impl ModuleDecoder {
             package: reader.get_package()?.into(),
             origin: Origin::Src,
             types: read_hashmap!(reader.get_types()?, self, type_constructor),
-            types_constructors: read_hashmap!(
+            types_value_constructors: read_hashmap!(
                 reader.get_types_constructors()?,
                 self,
                 constructors_list

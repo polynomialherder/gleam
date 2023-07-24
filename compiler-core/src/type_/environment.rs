@@ -64,7 +64,7 @@ impl<'a> Environment<'a> {
             ids,
             target,
             module_types: prelude.types.clone(),
-            module_types_constructors: prelude.types_constructors.clone(),
+            module_types_constructors: prelude.types_value_constructors.clone(),
             module_values: HashMap::new(),
             imported_modules: HashMap::new(),
             unused_modules: HashMap::new(),
@@ -297,7 +297,7 @@ impl<'a> Environment<'a> {
                     }
                 })?;
                 let _ = self.unused_modules.remove(m);
-                module.types_constructors.get(name).ok_or_else(|| {
+                module.types_value_constructors.get(name).ok_or_else(|| {
                     UnknownTypeConstructorError::ModuleType {
                         name: name.clone(),
                         module_name: module.name.clone(),

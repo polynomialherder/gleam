@@ -98,8 +98,8 @@ impl<'a> ModuleEncoder<'a> {
         tracing::trace!("Writing module metadata types to constructors mapping");
         let mut types_constructors = module
             .reborrow()
-            .init_types_constructors(self.data.types_constructors.len() as u32);
-        for (i, (name, constructors)) in self.data.types_constructors.iter().enumerate() {
+            .init_types_constructors(self.data.types_value_constructors.len() as u32);
+        for (i, (name, constructors)) in self.data.types_value_constructors.iter().enumerate() {
             let mut property = types_constructors.reborrow().get(i as u32);
             property.set_key(name);
             self.build_types_constructors_mapping(
