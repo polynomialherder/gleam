@@ -717,6 +717,8 @@ impl<'a> Compiler<'a> {
             .expect("The first row must have at least one column");
 
         match collapse_links(variable.type_.clone()).as_ref() {
+            Type::Fn { .. } | Type::Var { .. } => BranchMode::Infinite { variable },
+
             Type::Named { module, name, .. }
                 if is_prelude_module(module)
                     && (name == "Int"
@@ -749,10 +751,6 @@ impl<'a> Compiler<'a> {
                 variable,
                 types: elems.clone(),
             },
-
-            type_ @ (Type::Fn { .. } | Type::Var { .. }) => {
-                unreachable!("Unexpected type {:?}", type_)
-            }
         }
     }
 
