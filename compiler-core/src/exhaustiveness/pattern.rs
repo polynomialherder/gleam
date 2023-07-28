@@ -167,8 +167,9 @@ impl PatternArena {
                 };
                 // TODO: The arguments may not be given in the same order as the
                 // definition if labels are used. We need to check if that is
-                // the case (or if it has been expanded during earlier type
-                // checking) and then reorder the arguments if needed.
+                // the case (or if it has been expanded + reordered during
+                // earlier type checking) and then reorder the arguments if
+                // needed.
                 let arguments = arguments
                     .iter()
                     .map(|argument| self.register(&argument.value))

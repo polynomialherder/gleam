@@ -347,6 +347,12 @@ impl<'a> Compiler<'a> {
                             type_: variable.type_.clone(),
                             index: idx as u16,
                         };
+                        // TODO: This is using the type of the variant as
+                        // defined, but it actually needs to use the type of
+                        // this specific instance. If it is a generic type
+                        // parameter then it will have been instantiated with a
+                        // specific type.
+                        dbg!("fixme!");
                         let new_variables = self.new_variables(&constructor.parameters);
                         (variant, new_variables, Vec::new())
                     })
