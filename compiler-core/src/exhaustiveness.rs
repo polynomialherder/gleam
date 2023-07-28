@@ -335,7 +335,7 @@ impl<'a> Compiler<'a> {
                 element_type,
             } => self.compile_list_cases(rows, variable, element_type),
 
-            BranchMode::CustomType {
+            BranchMode::NamedType {
                 variable,
                 constructors: variants,
             } => {
@@ -510,11 +510,13 @@ impl<'a> Compiler<'a> {
                 // We should only be able to reach constructors here for well
                 // typed code. Invalid patterns should have been caught by
                 // earlier analysis.
-                let (cons, args) = match self.pattern(pattern) {
+                let (index, args) = match self.pattern(pattern) {
                     Pattern::Constructor {
                         constructor,
                         arguments,
-                    } => (constructor.clone(), arguments.clone()),
+                    } => (constructor.index(), arguments.clone()),
+
+                    Pattern::Tuple { elements } => (0, elements.clone()),
 
                     pattern @ (Pattern::Or { .. }
                     | Pattern::Int { .. }
@@ -530,7 +532,6 @@ impl<'a> Compiler<'a> {
                     | Pattern::StringPrefix { .. }) => panic!("Unexpected pattern {:?}", pattern),
                 };
 
-                let index = cons.index();
                 let mut columns = row.columns;
 
                 let case = cases.get_mut(index as usize).expect("Case must exist");
@@ -738,7 +739,7 @@ impl<'a> Compiler<'a> {
                     .custom_type_info(module, name)
                     .expect("Custom type variants must exist")
                     .to_vec();
-                BranchMode::CustomType {
+                BranchMode::NamedType {
                     variable,
                     constructors,
                 }
@@ -798,7 +799,7 @@ enum BranchMode {
         variable: Variable,
         element_type: Arc<Type>,
     },
-    CustomType {
+    NamedType {
         variable: Variable,
         constructors: Vec<TypeValueConstructor>,
     },
